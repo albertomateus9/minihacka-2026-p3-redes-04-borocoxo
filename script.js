@@ -563,3 +563,103 @@ if (copyBtn) {
     });
   });
 }
+
+// --- Lógica do Exercício de Respiração Guiada (Respiração Quadrada) ---
+const breathingCircle = document.getElementById("breathing-circle");
+const breathingState = document.getElementById("breathing-state");
+const breathingTimer = document.getElementById("breathing-timer");
+const btnBreathingControl = document.getElementById("btn-breathing-control");
+const breathingInstructions = document.getElementById("breathing-instructions");
+
+let breathingInterval = null;
+let breathingStep = 0; // 0: idle, 1: inhale, 2: hold, 3: exhale, 4: hold/rest
+let breathingTimeRemaining = 4;
+let breathingActive = false;
+
+function updateBreathingUI() {
+  if (!breathingActive) {
+    if (breathingCircle) {
+      breathingCircle.className = "breathing-circle";
+    }
+    if (breathingState) breathingState.textContent = "Iniciar";
+    if (breathingTimer) breathingTimer.textContent = "4s";
+    if (btnBreathingControl) btnBreathingControl.textContent = "Começar Exercício";
+    if (breathingInstructions) {
+      breathingInstructions.innerHTML = "Clique no botão para iniciar um ciclo guiado de respiração quadrada (4s inspirar, 4s segurar, 4s expirar, 4s repousar).";
+      breathingInstructions.style.color = "var(--text-secondary)";
+    }
+    return;
+  }
+
+  // Update classes and text based on the current step
+  if (breathingCircle) {
+    breathingCircle.className = "breathing-circle";
+  }
+
+  if (breathingStep === 1) { // Inhale
+    if (breathingCircle) breathingCircle.classList.add("inhale");
+    if (breathingState) breathingState.textContent = "Inhale";
+    if (breathingInstructions) {
+      breathingInstructions.innerHTML = "🍃 <strong>Inhale o ar profundamente</strong> expandindo o abdômen... Sinta a energia entrar.";
+      breathingInstructions.style.color = "#00f0ff";
+    }
+  } else if (breathingStep === 2) { // Hold
+    if (breathingCircle) breathingCircle.classList.add("hold");
+    if (breathingState) breathingState.textContent = "Segure";
+    if (breathingInstructions) {
+      breathingInstructions.innerHTML = "⏳ <strong>Segure a respiração</strong> sem forçar. Mantenha a mente calma.";
+      breathingInstructions.style.color = "#ffcf5a";
+    }
+  } else if (breathingStep === 3) { // Exhale
+    if (breathingCircle) breathingCircle.classList.add("exhale");
+    if (breathingState) breathingState.textContent = "Exhale";
+    if (breathingInstructions) {
+      breathingInstructions.innerHTML = "💨 <strong>Exhale lentamente esvaziando os pulmões</strong>... Solte toda a ansiedade escolar.";
+      breathingInstructions.style.color = "#a1a1aa";
+    }
+  } else if (breathingStep === 4) { // Rest/Hold empty
+    if (breathingState) breathingState.textContent = "Repouse";
+    if (breathingInstructions) {
+      breathingInstructions.innerHTML = "🧘 <strong>Fique sem ar confortavelmente</strong> antes do próximo ciclo. Relaxe os ombros.";
+      breathingInstructions.style.color = "var(--primary)";
+    }
+  }
+
+  if (breathingTimer) breathingTimer.textContent = `${breathingTimeRemaining}s`;
+}
+
+function startBreathingCycle() {
+  breathingStep = 1;
+  breathingTimeRemaining = 4;
+  updateBreathingUI();
+
+  breathingInterval = setInterval(() => {
+    breathingTimeRemaining--;
+    
+    if (breathingTimeRemaining <= 0) {
+      // Move to next step
+      breathingStep = (breathingStep % 4) + 1;
+      breathingTimeRemaining = 4;
+    }
+    
+    updateBreathingUI();
+  }, 1000);
+}
+
+if (btnBreathingControl) {
+  btnBreathingControl.addEventListener("click", () => {
+    if (breathingActive) {
+      // Stop
+      breathingActive = false;
+      clearInterval(breathingInterval);
+      breathingInterval = null;
+      updateBreathingUI();
+    } else {
+      // Start
+      breathingActive = true;
+      btnBreathingControl.textContent = "Parar Exercício";
+      startBreathingCycle();
+    }
+  });
+}
+
